@@ -1,1 +1,1 @@
-This is a simple practise
+This is a suspension camera application
