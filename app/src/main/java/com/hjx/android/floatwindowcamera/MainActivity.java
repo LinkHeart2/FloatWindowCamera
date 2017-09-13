@@ -19,7 +19,9 @@ import me.weyye.hipermission.HiPermission;
 import me.weyye.hipermission.PermissionCallback;
 import me.weyye.hipermission.PermissionItem;
 
+
 public class MainActivity extends Activity {
+
 
     private String TAG = getClass().getSimpleName();
     private static final int REQUEST_PERMISSION_WINDOW = 1;
@@ -40,22 +42,51 @@ public class MainActivity extends Activity {
 //                }
             }
         });
-        Button btnTakePic = (Button) findViewById(R.id.btn_to_take_pic);
-        btnTakePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, TakePicActivity.class);
-                startActivity(intent);
-            }
-        });
-        Button btnThreePic = (Button) findViewById(R.id.btn_to_three_pic);
-        btnThreePic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, TakePicThreeActivity.class);
-                startActivity(intent);
-            }
-        });
+
+
+//        Button btnTakePic = (Button) findViewById(R.id.btn_to_take_pic);
+//        btnTakePic.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(MainActivity.this, TakePicActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//        Button btnThreePic = (Button) findViewById(R.id.btn_to_three_pic);
+//        btnThreePic.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(MainActivity.this, TakePicThreeActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        Button btnToThreeVideo = (Button) findViewById(R.id.btn_to_three_video);
+//        btnToThreeVideo.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(MainActivity.this, TakeVideoThreeActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        findViewById(R.id.btn_video_test).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(MainActivity.this, TexttureTestActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//
+//        findViewById(R.id.btn_video_record).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(MainActivity.this, RecordVideoActivity.class);
+//                startActivity(intent);
+//            }
+//        });
+//
+
 
         doCheckPermission();
     }
@@ -70,6 +101,7 @@ public class MainActivity extends Activity {
         List<PermissionItem> list = new ArrayList<>();
         list.add(new PermissionItem(Manifest.permission.CAMERA, "照相机", R.drawable.permission_ic_camera));
         list.add(new PermissionItem(Manifest.permission.WRITE_EXTERNAL_STORAGE,"存储",R.drawable.permission_ic_storage));
+        list.add(new PermissionItem(Manifest.permission.RECORD_AUDIO,"麦克风",R.drawable.permission_ic_micro_phone));
         HiPermission.create(this)
                 .permissions(list)
                 .checkMutiPermission(new PermissionCallback() {
@@ -94,7 +126,6 @@ public class MainActivity extends Activity {
                         Log.i(TAG, "onGuarantee");
                     }
                 });
-        
     }
 
     private void showToast(String str) {
@@ -107,14 +138,22 @@ public class MainActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
         if (requestCode == REQUEST_PERMISSION_WINDOW) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 showFloatWindow();
             } else {
-                Toast.makeText(this, "请到", Toast.LENGTH_SHORT).show();
+
             }
         }
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
     }
+
+
+
+
+
 
 }

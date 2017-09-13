@@ -1,15 +1,27 @@
 package com.hjx.android.floatwindowcamera;
 
 import android.content.Context;
+import android.hardware.Camera;
+import android.media.CamcorderProfile;
+import android.media.MediaRecorder;
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
+
+import com.hjx.android.floatwindowcamera.util.SpUtil;
+import com.hjx.android.floatwindowcamera.util.UiUtil;
+import com.hjx.android.floatwindowcamera.util.Util;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 import io.fotoapparat.Fotoapparat;
@@ -32,10 +44,23 @@ import static io.fotoapparat.parameter.selector.SizeSelectors.biggestSize;
  * You can make it better
  */
 
-public class FloatWindowSmallView extends LinearLayout {
+public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.Callback {
 
     private static final int longClickTime = 300;
     private static final int takePicDelay = 300;
+    private static final String TAG = "FloatWindowSmallView";
+
+    private boolean mode;
+
+    private SurfaceView mSurfaceview;
+    private SurfaceHolder mSurfaceHolder;
+    private Camera myCamera;
+    private boolean isView;
+    private Camera.Parameters myParameters;
+    private boolean mStartedFlg;
+    private MediaRecorder mRecorder;
+    private Camera.AutoFocusCallback mAutoFocusCallback;
+
 
     /**
      * 记录小悬浮窗的宽度
@@ -52,7 +77,7 @@ public class FloatWindowSmallView extends LinearLayout {
      */
     private static int statusBarHeight;
 
-    private final Fotoapparat fotoapparat;
+    private Fotoapparat fotoapparat;
     private final CameraView cameraView;
     private final ImageView ivTakePic;
 
@@ -111,37 +136,18 @@ public class FloatWindowSmallView extends LinearLayout {
         viewHeight = view.getLayoutParams().height;
 
         ivTakePic = ((ImageView) findViewById(R.id.take_pic));
-        setPreView();
-
 
         cameraView = ((CameraView) findViewById(R.id.camera_view));
 
-        FlashSelectors selectors = new FlashSelectors();
-        fotoapparat = Fotoapparat
-                .with(getContext())
-                .into(cameraView)           // view which will draw the camera preview
-                .photoSize(biggestSize())   // we want to have the biggest photo possible
-                .lensPosition(back())       // we want back camera
-//                .focusMode(firstAvailable(  // (optional) use the first focus mode which is supported by device
-//                        continuousFocus(),
-//                        autoFocus(),        // in case if continuous focus is not available on device, auto focus will be used
-//                        fixed()             // if even auto focus is not available - fixed focus mode will be used
-//                ))
-                .flash(firstAvailable(      // (optional) similar to how it is done for focus mode, this time for flash
-                        autoRedEye(),
-                        autoFlash(),
-                        torch()
-                ))
-//                .frameProcessor(myFrameProcessor)   // (optional) receives each frame from preview stream
-                .logger(loggers(            // (optional) we want to log camera events in 2 places at once
-                        logcat(),           // ... in logcat
-                        fileLogger(getContext())    // ... and to file
-                ))
-                .flash(selectors.off())
-                .build();
-//        TextView percentView = (TextView) findViewById(R.id.percent);
-//        percentView.setText(MyWindowManager.getUsedPercentValue(context));
-        fotoapparat.start();
+        mSurfaceview = (SurfaceView) findViewById(R.id.capture_surfaceview);
+
+        setPreView();
+
+        setMode();
+
+
+
+
     }
 
     @Override
@@ -174,11 +180,54 @@ public class FloatWindowSmallView extends LinearLayout {
                          * 在这里放拍照操作
                          */
                         if(pressDownTime - prePressTime>takePicDelay) {
-                            final PhotoResult photoResult = fotoapparat.takePicture();
+                            if(mode) {//拍照
+                                final PhotoResult photoResult = fotoapparat.takePicture();
 
-                            final File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), System.currentTimeMillis() + ".jpg");
-                            photoResult.saveToFile(file);
+                                final File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), System.currentTimeMillis() + ".jpg");
+                                photoResult.saveToFile(file);
 //                            Toast.makeText(getContext(), "拍摄成功,图片已保存到" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+                            }else{//录像
+                                if(!mStartedFlg){
+                                    if(mRecorder == null){
+                                        mRecorder = new MediaRecorder();
+                                    }
+                                    try{
+                                        myCamera.unlock();
+                                        mRecorder.setCamera(myCamera);
+                                        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                                        mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+                                        mRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
+                                        mRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
+
+                                        String path = Util.getSDPath();
+                                        if(path!=null){
+                                            File dir = new File(path + "/VideoRecordTest");
+                                            if(!dir.exists()){
+                                                dir.mkdir();
+                                            }
+                                            path = dir + "/" + Util.getDate() + ".mp4";
+                                            mRecorder.setOutputFile(path);
+                                            mRecorder.prepare();
+                                            mRecorder.start();
+                                            mStartedFlg = true;
+                                            ivTakePic.setImageDrawable(getResources().getDrawable(R.drawable.rec_stop));
+                                        }
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }else{
+                                    if(mStartedFlg){
+                                        try {
+                                            mRecorder.stop();
+                                            mRecorder.reset();
+                                            ivTakePic.setBackground(getResources().getDrawable(R.drawable.rec_start));
+                                        }catch (Exception e){
+                                            e.printStackTrace();
+                                        }
+                                        mStartedFlg = false;
+                                    }
+                                }
+                            }
 
                         }
                     }
@@ -239,10 +288,143 @@ public class FloatWindowSmallView extends LinearLayout {
     }
 
     public void stopCamera(){
-        fotoapparat.stop();
+        if(fotoapparat!=null)
+            fotoapparat.stop();
+        if(mStartedFlg){
+            try {
+                mRecorder.stop();
+                mRecorder.reset();
+                ivTakePic.setBackground(getResources().getDrawable(R.drawable.rec_start));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            mStartedFlg = false;
+        }
+        if(mSurfaceview!=null){
+            mSurfaceview.setVisibility(GONE);
+        }
+
     }
 
     public void setPreView(){
         ivTakePic.setVisibility(SpUtil.getPreViewState()?GONE:VISIBLE);
+    }
+
+    public void setMode(){
+        mode = SpUtil.getMode();
+        cameraView.setVisibility(mode?VISIBLE:GONE);
+        mSurfaceview.setVisibility(mode?GONE:VISIBLE);
+        ivTakePic.setVisibility(mode?SpUtil.getPreViewState()?GONE:VISIBLE:VISIBLE);
+        ivTakePic.setImageDrawable(mode?getResources().getDrawable(R.drawable.take_shoot):getResources().getDrawable(R.drawable.rec_start));
+        if(mode){
+            initTakePic();
+        }else{
+            initRecordVideo();
+        }
+    }
+
+    private void initRecordVideo() {
+        mSurfaceview.setVisibility(VISIBLE);
+
+        //重写AutoFocusCallback接口
+        mAutoFocusCallback = new Camera.AutoFocusCallback() {
+            @Override
+            public void onAutoFocus(boolean success, Camera camera) {
+                if (success) {
+                    Log.i(TAG, "AutoFocus: success...");
+                } else {
+                    Log.i(TAG, "AutoFocus: failure...");
+                }
+            }
+        };
+
+        SurfaceHolder holder = mSurfaceview.getHolder();// 取得holder
+
+        holder.addCallback(this); // holder加入回调接口
+
+
+        holder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+    }
+
+    private void initTakePic(){
+        if(fotoapparat==null) {
+            FlashSelectors selectors = new FlashSelectors();
+            fotoapparat = Fotoapparat
+                    .with(getContext())
+                    .into(cameraView)           // view which will draw the camera preview
+                    .photoSize(biggestSize())   // we want to have the biggest photo possible
+                    .lensPosition(back())       // we want back camera
+//                .focusMode(firstAvailable(  // (optional) use the first focus mode which is supported by device
+//                        continuousFocus(),
+//                        autoFocus(),        // in case if continuous focus is not available on device, auto focus will be used
+//                        fixed()             // if even auto focus is not available - fixed focus mode will be used
+//                ))
+                    .flash(firstAvailable(      // (optional) similar to how it is done for focus mode, this time for flash
+                            autoRedEye(),
+                            autoFlash(),
+                            torch()
+                    ))
+//                .frameProcessor(myFrameProcessor)   // (optional) receives each frame from preview stream
+                    .logger(loggers(            // (optional) we want to log camera events in 2 places at once
+                            logcat(),           // ... in logcat
+                            fileLogger(getContext())    // ... and to file
+                    ))
+                    .flash(selectors.off())
+                    .build();
+        }
+//        TextView percentView = (TextView) findViewById(R.id.percent);
+//        percentView.setText(MyWindowManager.getUsedPercentValue(context));
+        fotoapparat.start();
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        mSurfaceHolder = holder;
+        initCamera();
+//        ivTakePic.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+        mSurfaceHolder = holder;
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        mSurfaceview = null;
+        mSurfaceHolder = null;
+        if(mRecorder != null){
+            mRecorder.release();
+            mRecorder = null;
+        }
+    }
+
+    private void initCamera() {
+        if(myCamera == null && !isView) {
+            myCamera = Camera.open();
+            Log.i(TAG, "camera.open");
+        }
+        if(myCamera != null && !isView){
+            try{
+                myParameters = myCamera.getParameters();
+                int dp48 = UiUtil.dpToPx(getContext(), 48);
+                myParameters.setPreviewSize(1920,1080);
+                myParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+                myCamera.setParameters(myParameters);
+                myCamera.setPreviewDisplay(mSurfaceHolder);
+                myCamera.startPreview();
+                isView = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "初始化相机错误",
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

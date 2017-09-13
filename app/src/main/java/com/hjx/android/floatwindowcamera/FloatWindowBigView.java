@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.hjx.android.floatwindowcamera.util.SpUtil;
+
 import java.io.File;
 
 /**
@@ -41,6 +43,7 @@ public class FloatWindowBigView extends LinearLayout {
         Button back = (Button) findViewById(R.id.back);
         Button openDir = (Button) findViewById(R.id.open_dir);
         Button showPreview = (Button) findViewById(R.id.show_preview);
+        Button changeMode = (Button) findViewById(R.id.change_mode);
         openDir.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,6 +77,17 @@ public class FloatWindowBigView extends LinearLayout {
                 //调转到图片存放的文件夹
                 SpUtil.putPreViewState(!SpUtil.getPreViewState());
                 MyWindowManager.setPreView();
+                MyWindowManager.removeBigWindow(context);
+                MyWindowManager.createSmallWindow(context);
+            }
+        });
+        changeMode.setText(SpUtil.getMode()?"切换为录视频":"切换为拍照");
+        changeMode.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //在拍照和录视频间切换
+                SpUtil.putMode(!SpUtil.getMode());
+                MyWindowManager.setMode();
                 MyWindowManager.removeBigWindow(context);
                 MyWindowManager.createSmallWindow(context);
             }
