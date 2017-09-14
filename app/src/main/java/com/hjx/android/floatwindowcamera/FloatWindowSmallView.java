@@ -125,6 +125,7 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
      */
     private long pressDownTime;
     private long prePressTime;
+    private String path_video;
 
     public FloatWindowSmallView(Context context) {
         super(context);
@@ -181,15 +182,16 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                         if(pressDownTime - prePressTime>takePicDelay) {
                             if(mode) {//拍照
                                 final PhotoResult photoResult = fotoapparat.takePicture();
-                                File dir = new File(Util.getSavePath() + "/MTPhoto");
+//                                File dir = new File(Util.getSavePath() + "/MTPhoto");
+                                File dir = new File(SpUtil.PIC_PATH);
                                 if(!dir.exists()){
                                     dir.mkdir();
                                 }
                                 final File file = new File( dir , Util.getDate() + ".jpg");
                                 photoResult.saveToFile(file);
-//                            Toast.makeText(getContext(), "拍摄成功,图片已保存到" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "拍摄成功,图片已保存到" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
                             }else{//录像
-                                if(!mStartedFlg){
+                                if(!mStartedFlg){//
                                     if(mRecorder == null){
                                         mRecorder = new MediaRecorder();
                                     }
@@ -204,14 +206,15 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                                         if(mSurfaceHolder == null)return false;
                                         mRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
 
-                                        String path = Util.getSavePath();
-                                        if(path!=null){
-                                            File dir = new File(path + "/MTVideo");
+                                        path_video = Util.getSavePath();
+                                        if(path_video !=null){
+//                                            File dir = new File(path + "/MTVideo");
+                                            File dir = new File(SpUtil.VIDEO_PATH);
                                             if(!dir.exists()){
                                                 dir.mkdir();
                                             }
-                                            path = dir + "/" + Util.getDate() + ".mp4";
-                                            mRecorder.setOutputFile(path);
+                                            path_video = dir + "/" + Util.getDate() + ".mp4";
+                                            mRecorder.setOutputFile(path_video);
                                             mRecorder.prepare();
                                             mRecorder.start();
                                             mStartedFlg = true;
@@ -226,6 +229,9 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                                             mRecorder.stop();
                                             mRecorder.reset();
                                             ivTakePic.setImageDrawable(getResources().getDrawable(R.drawable.rec_start));
+                                            if (path_video != null){
+                                                Toast.makeText(getContext(), "录像成功,已保存到" + path_video, Toast.LENGTH_SHORT).show();
+                                            }
                                         }catch (Exception e){
                                             e.printStackTrace();
                                         }
@@ -316,12 +322,12 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
     }
 
     public void setMode(){
-        mode = SpUtil.getMode();
+        mode = SpUtil.getMode();//true为拍照。。false为录像
         cameraView.setVisibility(mode?VISIBLE:GONE);
         mSurfaceview.setVisibility(mode?GONE:VISIBLE);
         ivTakePic.setVisibility(mode?SpUtil.getPreViewState()?GONE:VISIBLE:VISIBLE);
         ivTakePic.setImageDrawable(mode?getResources().getDrawable(R.drawable.take_shoot):getResources().getDrawable(R.drawable.rec_start));
-        if(mode){
+        if(mode){//true为拍照。。false为录像
             initTakePic();
         }else{
             initRecordVideo();

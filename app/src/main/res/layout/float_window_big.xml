@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/big_window_layout"
     android:layout_width="200dip"
-    android:layout_height="240dip"
+    android:layout_height="wrap_content"
     android:background="@color/colorAccent"
     android:orientation="vertical"
     >
@@ -20,7 +20,6 @@
         android:layout_width="140dip"
         android:layout_height="40dip"
         android:layout_gravity="center_horizontal"
-        android:layout_marginTop="12dip"
         android:text="切换为录视频"
         />
 
@@ -33,11 +32,18 @@
         android:text="预览开关"
         />
     <Button
-        android:id="@+id/open_dir"
+        android:id="@+id/open_img_dir"
         android:layout_width="140dip"
         android:layout_height="40dip"
         android:layout_gravity="center_horizontal"
         android:text="打开图片文件夹"
+        />
+    <Button
+        android:id="@+id/open_video_dir"
+        android:layout_width="140dip"
+        android:layout_height="40dip"
+        android:layout_gravity="center_horizontal"
+        android:text="打开视频文件夹"
         />
     <Button
         android:id="@+id/back"

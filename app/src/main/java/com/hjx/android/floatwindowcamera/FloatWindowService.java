@@ -63,13 +63,13 @@ public class FloatWindowService extends Service {
                     }
                 });
             }
-            // 当前界面不是桌面，且有悬浮窗显示，则移除悬浮窗。
+            // 当前界面不是桌面，且有悬浮窗显示，则移除悬浮窗。该app应用的activity界面
             else if (!isHome() && MyWindowManager.isWindowShowing()) {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        MyWindowManager.removeSmallWindow(getApplicationContext());
-                        MyWindowManager.removeBigWindow(getApplicationContext());
+//                        MyWindowManager.removeSmallWindow(getApplicationContext());
+//                        MyWindowManager.removeBigWindow(getApplicationContext());
                     }
                 });
             }

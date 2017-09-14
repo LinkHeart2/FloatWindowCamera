@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="幻化万千戏红尘天府大道弹出拍照悬浮球">
+        android:text="弹出拍照悬浮球">
     </Button>
     <!--<Button-->
         <!--android:id="@+id/btn_to_take_pic"-->
