@@ -4,7 +4,6 @@ import android.content.Context;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -182,8 +181,11 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                         if(pressDownTime - prePressTime>takePicDelay) {
                             if(mode) {//拍照
                                 final PhotoResult photoResult = fotoapparat.takePicture();
-
-                                final File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), System.currentTimeMillis() + ".jpg");
+                                File dir = new File(Util.getSavePath() + "/MTPhoto");
+                                if(!dir.exists()){
+                                    dir.mkdir();
+                                }
+                                final File file = new File( dir , Util.getDate() + ".jpg");
                                 photoResult.saveToFile(file);
 //                            Toast.makeText(getContext(), "拍摄成功,图片已保存到" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
                             }else{//录像
@@ -196,12 +198,15 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                                         mRecorder.setCamera(myCamera);
                                         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
                                         mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
+                                        mRecorder.setOrientationHint(90);
+
                                         mRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
+                                        if(mSurfaceHolder == null)return false;
                                         mRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
 
-                                        String path = Util.getSDPath();
+                                        String path = Util.getSavePath();
                                         if(path!=null){
-                                            File dir = new File(path + "/VideoRecordTest");
+                                            File dir = new File(path + "/MTVideo");
                                             if(!dir.exists()){
                                                 dir.mkdir();
                                             }
@@ -220,7 +225,7 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                                         try {
                                             mRecorder.stop();
                                             mRecorder.reset();
-                                            ivTakePic.setBackground(getResources().getDrawable(R.drawable.rec_start));
+                                            ivTakePic.setImageDrawable(getResources().getDrawable(R.drawable.rec_start));
                                         }catch (Exception e){
                                             e.printStackTrace();
                                         }
@@ -294,7 +299,7 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
             try {
                 mRecorder.stop();
                 mRecorder.reset();
-                ivTakePic.setBackground(getResources().getDrawable(R.drawable.rec_start));
+                ivTakePic.setImageDrawable(getResources().getDrawable(R.drawable.rec_start));
             }catch (Exception e){
                 e.printStackTrace();
             }
@@ -324,6 +329,8 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
     }
 
     private void initRecordVideo() {
+
+
         mSurfaceview.setVisibility(VISIBLE);
 
         //重写AutoFocusCallback接口
@@ -414,6 +421,7 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
             try{
                 myParameters = myCamera.getParameters();
                 int dp48 = UiUtil.dpToPx(getContext(), 48);
+                myCamera.setDisplayOrientation(90);
                 myParameters.setPreviewSize(1920,1080);
                 myParameters.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
                 myCamera.setParameters(myParameters);

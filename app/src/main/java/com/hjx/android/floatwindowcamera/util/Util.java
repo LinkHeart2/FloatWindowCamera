@@ -14,13 +14,13 @@ public class Util {
     /**
      * 获取SD path
      */
-    public static String getSDPath(){
+    public static String getSavePath(){
         File sdDir = null;
         boolean sdCardExist = Environment.getExternalStorageState()
                 .equals(android.os.Environment.MEDIA_MOUNTED); // 判断sd卡是否存在
         if (sdCardExist)
         {
-            sdDir = Environment.getExternalStorageDirectory();// 获取根目录
+            sdDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);// 获取根目录
             return sdDir.toString();
         }
 

@@ -87,7 +87,6 @@ public class MainActivity extends Activity {
 //        });
 //
 
-
         doCheckPermission();
     }
 
