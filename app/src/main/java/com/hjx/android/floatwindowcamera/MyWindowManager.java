@@ -157,6 +157,12 @@ public class MyWindowManager {
         }
     }
 
+    public static void setMode(){
+        if(smallWindow != null){
+            smallWindow.setMode();
+        }
+    }
+
     /**
      * 是否有悬浮窗(包括小悬浮窗和大悬浮窗)显示在屏幕上。
      *

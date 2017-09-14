@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/big_window_layout"
     android:layout_width="200dip"
-    android:layout_height="180dip"
+    android:layout_height="240dip"
     android:background="@color/colorAccent"
     android:orientation="vertical"
     >
@@ -15,6 +15,16 @@
         android:layout_marginTop="12dip"
         android:text="关闭悬浮窗"
         />
+    <Button
+        android:id="@+id/change_mode"
+        android:layout_width="140dip"
+        android:layout_height="40dip"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="12dip"
+        android:text="切换为录视频"
+        />
+
+
     <Button
         android:id="@+id/show_preview"
         android:layout_width="140dip"

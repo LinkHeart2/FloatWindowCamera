@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@android:color/transparent"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:padding="20.0dip">
+
+    <LinearLayout
+        android:background="@android:color/transparent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="50.0dip">
+
+
+            <TextView
+                android:id="@+id/title"
+                android:background="@drawable/dialog_top_shape"
+                android:text="退出直播"
+                android:layout_width="fill_parent"
+                android:layout_height="50.0dip"
+                android:textSize="18sp"
+                android:gravity="center"
+                android:textColor="@color/color_white"
+                android:visibility="visible" />
+
+
+            <ImageButton
+                android:id="@+id/btn_cancel"
+                android:layout_width="50.0dip"
+                android:layout_height="50.0dip"
+                android:background="@android:color/transparent"
+                android:src="@mipmap/cancel"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/content"
+            android:background="#fff"
+            android:paddingTop="40dp"
+            android:paddingBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+            <TextView
+                android:id="@+id/message"
+                android:text="是否支持回放？"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/color_black"
+                android:textSize="18sp"
+                android:gravity="center"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:background="@drawable/dialog_bottom_shape"
+            android:layout_width="fill_parent"
+            android:layout_height="60.0dip"
+            android:layout_gravity="bottom"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/positiveButton"
+                android:background="@color/color_white"
+                android:layout_width="114.0dip"
+                android:layout_height="40.0dip"
+                android:gravity="center"
+                android:textColor="#939393"
+                android:layout_marginRight="10.0dip"
+                android:textSize="18sp"
+                android:text="取消" />
+
+            <View
+                android:id="@+id/line"
+                android:layout_width="1dp"
+                android:gravity="center"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:layout_height="wrap_content"
+                android:background="#DEDEDE"/>
+
+            <Button
+                android:id="@+id/negativeButton"
+                android:background="@color/color_white"
+                android:layout_width="114.0dip"
+                android:layout_height="40.0dip"
+                android:layout_marginLeft="10.0dip"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18sp"
+                android:text="确定" />
+        </LinearLayout>
+    </LinearLayout>
+
+</FrameLayout>
