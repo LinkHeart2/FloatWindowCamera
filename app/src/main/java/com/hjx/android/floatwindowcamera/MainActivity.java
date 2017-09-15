@@ -12,6 +12,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.hjx.android.floatwindowcamera.util.SpUtil;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +34,15 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SpUtil.putMode(true);
+        File folder = new File( SpUtil.PIC_PATH);
+        File folder2 = new File( SpUtil.VIDEO_PATH);
+        if (!folder.exists()){
+            folder.mkdir();
+        }
+        if (!folder2.exists()){
+            folder2.mkdir();
+        }
         Button startFloatWindow = (Button) findViewById(R.id.start_float_window);
         startFloatWindow.setOnClickListener(new View.OnClickListener() {
             @Override

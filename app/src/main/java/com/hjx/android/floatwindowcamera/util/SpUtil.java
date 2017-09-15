@@ -2,6 +2,7 @@ package com.hjx.android.floatwindowcamera.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Environment;
 
 /**
  * Created by hjx on 0013 7-13.
@@ -14,6 +15,8 @@ public class SpUtil {
     private static String PREVIEW_STATE = "preview_state";
     private static String MODE_TAKEPIC = "mode_takepic";
 
+    public static String PIC_PATH = Environment.getExternalStorageDirectory()+"/MTPhoto/";
+    public static String VIDEO_PATH = Environment.getExternalStorageDirectory()+"/MTVideo/";
 
     private static SharedPreferences sp;
 

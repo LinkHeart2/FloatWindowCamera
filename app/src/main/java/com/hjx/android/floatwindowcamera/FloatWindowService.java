@@ -9,6 +9,8 @@ import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.IBinder;
 
+import com.hjx.android.floatwindowcamera.util.SpUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -45,6 +47,7 @@ public class FloatWindowService extends Service {
         MyWindowManager.stopWindowCamera();
 
         super.onDestroy();
+        SpUtil.putMode(true);
         // Service被终止的同时也停止定时器继续运行
         timer.cancel();
         timer = null;
@@ -63,7 +66,7 @@ public class FloatWindowService extends Service {
                     }
                 });
             }
-            // 当前界面不是桌面，且有悬浮窗显示，则移除悬浮窗。
+            // 当前界面不是桌面，且有悬浮窗显示，则移除悬浮窗。该app应用的activity界面
             else if (!isHome() && MyWindowManager.isWindowShowing()) {
                 handler.post(new Runnable() {
                     @Override

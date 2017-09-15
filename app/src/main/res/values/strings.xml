@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">MT拍</string>
 
+    <string name="count">共%1$s个文件</string>
 
 
     <string name="imagedescription">image</string>
