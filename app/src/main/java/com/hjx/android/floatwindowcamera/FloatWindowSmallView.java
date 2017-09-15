@@ -191,7 +191,7 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                                 photoResult.saveToFile(file);
                             Toast.makeText(getContext(), "拍摄成功,图片已保存到" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
                             }else{//录像
-                                if(!mStartedFlg){//
+                                if(!mStartedFlg){////true时表示正在录像，false表示已经停止了录像
                                     if(mRecorder == null){
                                         mRecorder = new MediaRecorder();
                                     }
@@ -202,6 +202,15 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                                         mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
                                         mRecorder.setOrientationHint(90);
 
+                                        //设置video的编码格式
+//                                        mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+                                        //设置录制的视频编码比特率
+                                        mRecorder.setVideoEncodingBitRate(1024 * 1024);
+                                        //设置录制的视频帧率,注意文档的说明:
+                                        mRecorder.setVideoFrameRate(30);
+                                        //设置要捕获的视频的宽度和高度
+                                        mSurfaceHolder.setFixedSize(640, 480);//最高只能设置640x480
+                                        mRecorder.setVideoSize(640, 480);//最高只能设置640x480
                                         mRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
                                         if(mSurfaceHolder == null)return false;
                                         mRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
@@ -217,14 +226,14 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                                             mRecorder.setOutputFile(path_video);
                                             mRecorder.prepare();
                                             mRecorder.start();
-                                            mStartedFlg = true;
+                                            mStartedFlg = true;//true时表示正在录像，false表示已经停止了录像
                                             ivTakePic.setImageDrawable(getResources().getDrawable(R.drawable.rec_stop));
                                         }
                                     } catch (IOException e) {
                                         e.printStackTrace();
                                     }
                                 }else{
-                                    if(mStartedFlg){
+                                    if(mStartedFlg){//true时表示正在录像，false表示已经停止了录像
                                         try {
                                             mRecorder.stop();
                                             mRecorder.reset();
