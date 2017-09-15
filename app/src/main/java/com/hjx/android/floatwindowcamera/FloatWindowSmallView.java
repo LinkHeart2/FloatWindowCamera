@@ -1,9 +1,11 @@
 package com.hjx.android.floatwindowcamera;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaRecorder;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -11,10 +13,12 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.hjx.android.floatwindowcamera.filemanager.SDCardActivity;
 import com.hjx.android.floatwindowcamera.util.SpUtil;
 import com.hjx.android.floatwindowcamera.util.UiUtil;
 import com.hjx.android.floatwindowcamera.util.Util;
@@ -126,14 +130,23 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
     private long pressDownTime;
     private long prePressTime;
     private String path_video;
-
-    public FloatWindowSmallView(Context context) {
+    private Context context;
+    private boolean isShow =true;
+    public FloatWindowSmallView(final Context context) {
         super(context);
+        this.context = context;
         windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         LayoutInflater.from(context).inflate(R.layout.float_window_small, this);
         View view = findViewById(R.id.small_window_layout);
         viewWidth = view.getLayoutParams().width;
         viewHeight = view.getLayoutParams().height;
+
+
+        ImageButton iv_open_imgdir = (ImageButton) findViewById(R.id.iv_open_imgdir);
+        ImageButton iv_open_videodir = (ImageButton) findViewById(R.id.iv_open_videodir);
+        ImageButton iv_closeapp = (ImageButton) findViewById(R.id.iv_closeapp);
+        ImageButton iv_openvideo = (ImageButton) findViewById(R.id.iv_openvideo);
+        ImageButton iv_preview = (ImageButton) findViewById(R.id.iv_preview);
 
         ivTakePic = ((ImageView) findViewById(R.id.take_pic));
 
@@ -146,10 +159,75 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
         setMode();
 
 
+        iv_open_imgdir.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //调转到图片存放的文件夹
+//                openAssignFolder(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath());
+                String path = SpUtil.PIC_PATH;
+                openOppointDir(path);
+                MyWindowManager.removeBigWindow(context);
+                MyWindowManager.createSmallWindow(context);
+            }
+        });
 
+        iv_open_videodir.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //调转到视频存放的文件夹
+//                openAssignFolder(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM).getAbsolutePath());
+                String path = SpUtil.VIDEO_PATH;
+                openOppointDir(path);
+                MyWindowManager.removeBigWindow(context);
+                MyWindowManager.createSmallWindow(context);
+            }
+        });
+
+        iv_openvideo.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //调转到视频存放的文件夹
+                mode = false;
+                setMode();
+            }
+        });
+
+        iv_closeapp.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //调转到视频存放的文件夹
+                Intent intent = new Intent(context,FloatWindowService.class);
+                context.stopService(intent);
+                System.exit(0);
+            }
+        });
+
+        iv_preview.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //调转到视频存放的文件夹
+
+                if (isShow){
+                    ivTakePic.setVisibility(VISIBLE);
+                    isShow = false;
+                }else {
+                    ivTakePic.setVisibility(GONE);
+                    isShow = true;
+                }
+            }
+        });
 
     }
 
+    private void openOppointDir(String path){
+        Intent intent = new Intent(context, SDCardActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        Bundle bundle = new Bundle();
+        bundle.putString("path",path);//Environment.getDataDirectory().getParentFile().getAbsolutePath(),本地手机根目录路径
+        bundle.putString("name", "SD卡");
+        intent.putExtras(bundle);
+        context.startActivity(intent);
+    }
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
@@ -202,16 +280,19 @@ public class FloatWindowSmallView extends LinearLayout implements SurfaceHolder.
                                         mRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
                                         mRecorder.setOrientationHint(90);
 
+                                        mRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
+
                                         //设置video的编码格式
 //                                        mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
+//                                        mRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.MPEG_4_SP);// 视频录制格式
+
                                         //设置录制的视频编码比特率
-                                        mRecorder.setVideoEncodingBitRate(1024 * 1024);
+//                                        mRecorder.setVideoEncodingBitRate(1024 * 1024);
                                         //设置录制的视频帧率,注意文档的说明:
                                         mRecorder.setVideoFrameRate(30);
                                         //设置要捕获的视频的宽度和高度
                                         mSurfaceHolder.setFixedSize(640, 480);//最高只能设置640x480
                                         mRecorder.setVideoSize(640, 480);//最高只能设置640x480
-                                        mRecorder.setProfile(CamcorderProfile.get(CamcorderProfile.QUALITY_720P));
                                         if(mSurfaceHolder == null)return false;
                                         mRecorder.setPreviewDisplay(mSurfaceHolder.getSurface());
 

@@ -63,6 +63,7 @@ public class MyWindowManager {
             if (smallWindowParams == null) {
                 smallWindowParams = new WindowManager.LayoutParams();
                 smallWindowParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+//                smallWindowParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
                 smallWindowParams.format = PixelFormat.RGBA_8888;
                 smallWindowParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
                         | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;

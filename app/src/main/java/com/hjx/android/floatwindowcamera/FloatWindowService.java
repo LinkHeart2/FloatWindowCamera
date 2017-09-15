@@ -9,6 +9,8 @@ import android.content.pm.ResolveInfo;
 import android.os.Handler;
 import android.os.IBinder;
 
+import com.hjx.android.floatwindowcamera.util.SpUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -45,6 +47,7 @@ public class FloatWindowService extends Service {
         MyWindowManager.stopWindowCamera();
 
         super.onDestroy();
+        SpUtil.putMode(true);
         // Service被终止的同时也停止定时器继续运行
         timer.cancel();
         timer = null;
@@ -68,8 +71,8 @@ public class FloatWindowService extends Service {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-//                        MyWindowManager.removeSmallWindow(getApplicationContext());
-//                        MyWindowManager.removeBigWindow(getApplicationContext());
+                        MyWindowManager.removeSmallWindow(getApplicationContext());
+                        MyWindowManager.removeBigWindow(getApplicationContext());
                     }
                 });
             }

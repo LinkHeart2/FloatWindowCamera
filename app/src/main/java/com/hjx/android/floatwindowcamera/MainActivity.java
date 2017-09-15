@@ -34,6 +34,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        SpUtil.putMode(true);
         File folder = new File( SpUtil.PIC_PATH);
         File folder2 = new File( SpUtil.VIDEO_PATH);
         if (!folder.exists()){
